@@ -128,26 +128,63 @@ wss.on('connection', (ws) => {
 
 async function broadcastLeaderboard() {
     try {
-        // Fetch Top 50 from DB
-        const topPlayers = await PlayerModel.find()
-            .sort({ score: -1 })
-            .limit(50)
-            .lean();
+        // Build a map of all known players (name -> data)
+        const playerMap = new Map();
 
-        // Merge with online players who might not be in DB yet or have newer scores
-        // (Though in this version we update DB on every click)
-        const leaderboard = topPlayers.map(p => ({
-            name: p.name,
-            score: p.score,
-            maxPps: p.maxPps,
-            maxCombo: p.maxCombo,
-            isOnline: Array.from(activePlayers.values()).some(ap => ap.name === p.name)
-        }));
+        // 1. Try to load from DB first (if connected)
+        if (mongoose.connection.readyState === 1) {
+            try {
+                const topPlayers = await PlayerModel.find()
+                    .sort({ score: -1 })
+                    .limit(50)
+                    .lean();
+
+                for (const p of topPlayers) {
+                    playerMap.set(p.name, {
+                        name: p.name,
+                        score: p.score || 0,
+                        maxPps: p.maxPps || 0,
+                        maxCombo: p.maxCombo || 0,
+                        isOnline: false
+                    });
+                }
+            } catch (dbErr) {
+                console.error('DB query error (non-fatal):', dbErr.message);
+            }
+        }
+
+        // 2. Merge with active online players (always works, even without DB)
+        for (const [id, player] of activePlayers) {
+            const existing = playerMap.get(player.name);
+            if (existing) {
+                // Use the higher score between DB and in-memory
+                existing.score = Math.max(existing.score, player.score);
+                existing.maxPps = Math.max(existing.maxPps, player.maxPps);
+                existing.maxCombo = Math.max(existing.maxCombo, player.maxCombo);
+                existing.isOnline = true;
+            } else {
+                playerMap.set(player.name, {
+                    name: player.name,
+                    score: player.score,
+                    maxPps: player.maxPps,
+                    maxCombo: player.maxCombo,
+                    isOnline: true
+                });
+            }
+        }
+
+        // 3. Sort by score and send
+        const leaderboard = Array.from(playerMap.values())
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 50);
+
+        const onlineCount = Array.from(activePlayers.values())
+            .filter(p => !p.name.startsWith('Guest ')).length;
 
         const payload = JSON.stringify({
             type: 'leaderboard',
             players: leaderboard,
-            totalPlayers: await PlayerModel.countDocuments()
+            totalPlayers: Math.max(leaderboard.length, onlineCount)
         });
 
         wss.clients.forEach(client => {
