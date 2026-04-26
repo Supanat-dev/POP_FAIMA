@@ -224,10 +224,8 @@ function doPop(e) {
     }
 
     clearTimeout(comboTimer);
-    if (comboCount >= 10) showCombo(comboCount);
     comboTimer = setTimeout(() => {
         comboCount = 0;
-        comboEl.classList.replace('visible', 'hidden');
     }, 500);
 
     spawnParticles(e);
@@ -258,20 +256,7 @@ function handleUp() {
     closeMouth();
 }
 
-// ===== COMBO =====
-function showCombo(n) {
-    const labels = [
-        [100, '🔥 LEGENDARY!! 🔥'],
-        [50,  '⚡ INSANE! ⚡'],
-        [30,  '💥 MEGA COMBO! 💥'],
-        [20,  '🎯 SUPER! 🎯'],
-        [10,  `✨ COMBO x${n} ✨`],
-    ];
-    const [, txt] = labels.find(([min]) => n >= min) || [];
-    if (!txt) return;
-    comboTextEl.textContent = txt;
-    comboEl.classList.replace('hidden', 'visible');
-}
+
 
 // ===== PARTICLES =====
 function spawnParticles(e) {
