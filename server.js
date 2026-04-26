@@ -116,6 +116,30 @@ wss.on('connection', (ws) => {
                     }
                     broadcastLeaderboard();
                     break;
+
+                case 'adminDelete':
+                    if (msg.pass === 'PopAdmin999') {
+                        const targetName = msg.target;
+                        
+                        // 1. Delete from DB
+                        if (mongoose.connection.readyState === 1) {
+                            await PlayerModel.deleteMany({ name: targetName }).catch(e => console.error(e));
+                        }
+                        
+                        // 2. Remove from active players
+                        for (const [id, p] of activePlayers) {
+                            if (p.name === targetName) {
+                                activePlayers.delete(id);
+                                // Tell their client their score was reset
+                                if (p.ws.readyState === 1) {
+                                    p.ws.send(JSON.stringify({ type: 'syncScore', score: 0, maxPps: 0, maxCombo: 0 }));
+                                }
+                            }
+                        }
+                        console.log(`💀 Admin deleted player: ${targetName}`);
+                        broadcastLeaderboard();
+                    }
+                    break;
             }
         } catch (e) {}
     });

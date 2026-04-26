@@ -12,6 +12,8 @@ let playerName = '';
 let ws = null;
 let statsChanged = false;
 let lastTouchTime = 0;
+let secretClickCount = 0;
+let secretTimer = null;
 
 // ===== DOM ELEMENTS =====
 const faceClosed    = document.getElementById('face-closed');
@@ -343,6 +345,29 @@ function startGame() {
     });
 
     document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    // ===== SECRET ADMIN MODE =====
+    const mainTitle = document.querySelector('.main-title');
+    if (mainTitle) {
+        mainTitle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            secretClickCount++;
+            clearTimeout(secretTimer);
+            secretTimer = setTimeout(() => { secretClickCount = 0; }, 1500);
+            
+            if (secretClickCount >= 7) {
+                secretClickCount = 0;
+                const pass = prompt('🔑 Admin Mode:');
+                if (pass === 'PopAdmin999') {
+                    const target = prompt('💀 ใส่ชื่อคนที่จะลบออกจาก Leaderboard:');
+                    if (target && ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({ type: 'adminDelete', pass: pass, target: target }));
+                        alert('✅ ลบ ' + target + ' เรียบร้อยแล้ว!');
+                    }
+                }
+            }
+        });
+    }
 }
 
 // preload
