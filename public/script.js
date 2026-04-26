@@ -95,6 +95,20 @@ function connectWS() {
                 ws.send(JSON.stringify({ type: 'setName', name: playerName }));
                 // Send current best stats right away!
                 ws.send(JSON.stringify({ type: 'updateStats', score: highScore, maxPps: maxPps, maxCombo: maxComboScore }));
+            } else if (msg.type === 'syncScore') {
+                popCount = msg.score;
+                highScore = msg.score;
+                maxPps = msg.maxPps;
+                maxComboScore = msg.maxCombo;
+                
+                // Update UI
+                if (counterEl) counterEl.textContent = popCount.toLocaleString();
+                if (highscoreEl) highscoreEl.textContent = highScore.toLocaleString();
+                
+                // Update LocalStorage
+                localStorage.setItem('popHighScore', highScore);
+                localStorage.setItem('popMaxPps', maxPps);
+                localStorage.setItem('popMaxCombo', maxComboScore);
             } else if (msg.type === 'leaderboard') {
                 renderLeaderboard(msg.players, msg.totalPlayers);
             }
@@ -119,16 +133,20 @@ function renderLeaderboard(players, total) {
 
     players.forEach((p, i) => {
         const rank = i + 1;
-        const me   = p.id === myPlayerId;
+        const me   = p.name === playerName;
         const div  = document.createElement('div');
         div.className = 'lb-entry' +
             (rank <= 3 ? ' rank-' + rank : '') +
-            (me ? ' is-me' : '');
+            (me ? ' is-me' : '') +
+            (p.isOnline ? ' online' : ' offline');
 
         div.innerHTML = `
             <div class="lb-left">
                 <div class="lb-rank">${rank <= 3 ? medals[rank] : rank}</div>
-                <div class="lb-name">${esc(p.name)}${me ? ' 👈' : ''}</div>
+                <div class="lb-name">
+                    ${esc(p.name)}${me ? ' 👈' : ''}
+                    <span class="status-dot"></span>
+                </div>
             </div>
             <div class="lb-score" title="Best Score">${p.score.toLocaleString()}</div>
         `;

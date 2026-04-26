@@ -502,6 +502,27 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.lb-entry.online .status-dot {
+    background: #2ecc71;
+    box-shadow: 0 0 8px #2ecc71;
+}
+
+.lb-entry.offline .status-dot {
+    background: #95a5a6;
+    opacity: 0.5;
 }
 
 .lb-entry.is-me .lb-name { color: #ff8a8a; }
