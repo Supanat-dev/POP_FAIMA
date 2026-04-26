@@ -11,6 +11,7 @@ let myPlayerId = null;
 let playerName = '';
 let ws = null;
 let statsChanged = false;
+let lastTouchTime = 0;
 
 // ===== DOM ELEMENTS =====
 const faceClosed    = document.getElementById('face-closed');
@@ -345,10 +346,14 @@ setInterval(() => {
 function startGame() {
     connectWS();
 
-    document.addEventListener('mousedown', handleDown);
+    document.addEventListener('mousedown', (e) => {
+        if (Date.now() - lastTouchTime < 300) return; // Prevent double fire on mobile
+        handleDown(e);
+    });
     document.addEventListener('mouseup',   handleUp);
 
     document.addEventListener('touchstart', (e) => {
+        lastTouchTime = Date.now();
         handleDown(e.touches[0]);
     }, { passive: false });
 
