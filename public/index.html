@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 POP FAIMA 🔥</title>
+    <meta name="description" content="Pop ใฝ่ม้า - คลิกเพื่อป๊อป! เว็ปสุดฮาที่คุณจะหยุดคลิกไม่ได้">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee+Shade&family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Name input modal -->
+    <div id="name-modal">
+        <div id="name-modal-content">
+            <div id="modal-icon">🔥</div>
+            <h1 id="modal-title">POP ใฝ่ม้า</h1>
+            <p id="modal-subtitle">ใส่ชื่อบันทึกสถิติขึ้นลีดเดอร์บอร์ด!</p>
+            <input type="text" id="name-input" placeholder="ชื่อของคุณ..." maxlength="20" autocomplete="off" spellcheck="false">
+            <button id="name-submit">เริ่ม POP! 🚀</button>
+        </div>
+    </div>
+
+    <!-- Particle container -->
+    <div id="particles"></div>
+
+    <!-- Combo display -->
+    <div id="combo" class="hidden">
+        <span id="combo-text"></span>
+    </div>
+
+    <!-- Main layout -->
+    <div id="main-layout">
+
+        <!-- Left: Stats -->
+        <div id="stats-panel">
+            <div class="stat-card">
+                <div class="stat-label">PER SEC</div>
+                <div id="pps">0</div>
+            </div>
+        </div>
+
+        <!-- Center: Face + Leaderboard -->
+        <div id="center-col">
+            <div class="game-title-group">
+                <h1 class="main-title">POP FAIMA</h1>
+                <h2 class="sub-title">ป๊อปใฝ่ม้า</h2>
+            </div>
+            <!-- Face -->
+            <div id="pop-area">
+                <img id="face-closed" src="images/mouth-closed.jpg" alt="ปิดปาก" class="face-img active">
+                <img id="face-open" src="images/mouth-open.jpg" alt="อ้าปาก" class="face-img">
+            </div>
+
+            <!-- Instruction -->
+            <div id="instruction">
+                <span class="tap-icon">👆</span> คลิกเพื่อ POP!
+            </div>
+
+            <!-- Leaderboard below face -->
+            <div id="leaderboard-section">
+                <div id="leaderboard-header">
+                    <span id="lb-title">
+                        🏆 LEADERBOARD
+                        <button id="edit-name-btn" style="background:none;border:none;color:#ff6b6b;font-family:'Outfit',sans-serif;font-weight:700;font-size:12px;cursor:pointer;text-decoration:underline;margin-left:8px;transition:opacity 0.2s;">(เปลี่ยนชื่อ)</button>
+                    </span>
+                    <span id="online-count">
+                        <span class="online-dot"></span>
+                        <span id="online-text">0 ออนไลน์</span>
+                    </span>
+                </div>
+                <div id="leaderboard-list">
+                    <div class="lb-empty">รอผู้เล่น...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Stats -->
+        <div id="right-panel">
+            <div class="stat-card" id="counter-card">
+                <div class="stat-label">POPS</div>
+                <div id="counter">0</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
