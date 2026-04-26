@@ -231,7 +231,6 @@ function doPop(e) {
     }, 500);
 
     spawnParticles(e);
-    spawnFloat(e);
     spawnRipple(e);
 
     if (comboCount > 20) {
@@ -289,19 +288,6 @@ function spawnParticles(e) {
         particles.appendChild(p);
         setTimeout(() => p.remove(), 1400);
     }
-}
-
-// ===== FLOAT TEXT =====
-function spawnFloat(e) {
-    if (comboCount % 5 !== 0 && comboCount < 10) return;
-    const words = ['POP!','ป๊อป!','💥','🔥','NICE!','WOW!','เก่ง!','👏'];
-    const el = document.createElement('div');
-    el.className = 'float-text';
-    el.textContent = words[Math.floor(Math.random() * words.length)];
-    el.style.left = ((e.clientX ?? window.innerWidth/2) + (Math.random()-.5)*130) + 'px';
-    el.style.top  = ((e.clientY ?? window.innerHeight/2) - 40) + 'px';
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 800);
 }
 
 // ===== RIPPLE =====
