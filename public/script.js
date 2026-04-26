@@ -14,6 +14,8 @@ let statsChanged = false;
 let lastTouchTime = 0;
 let secretClickCount = 0;
 let secretTimer = null;
+let isAdminMode = false;
+let adminPass = '';
 
 // ===== DOM ELEMENTS =====
 const faceClosed    = document.getElementById('face-closed');
@@ -142,6 +144,19 @@ function renderLeaderboard(players, total) {
             (rank <= 3 ? ' rank-' + rank : '') +
             (me ? ' is-me' : '') +
             (p.isOnline ? ' online' : ' offline');
+        
+        if (isAdminMode) {
+            div.style.cursor = 'crosshair';
+            div.style.border = '1px solid rgba(255,0,0,0.5)';
+            div.title = 'Click to delete player';
+            div.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (confirm(`💀 คุณแน่ใจนะว่าจะลบ "${p.name}" ออกจากเซิร์ฟเวอร์?`)) {
+                    ws.send(JSON.stringify({ type: 'adminDelete', pass: adminPass, target: p.name }));
+                    alert(`✅ สั่งลบ ${p.name} เรียบร้อย!`);
+                }
+            });
+        }
 
         div.innerHTML = `
             <div class="lb-left">
@@ -357,13 +372,26 @@ function startGame() {
             
             if (secretClickCount >= 7) {
                 secretClickCount = 0;
-                const pass = prompt('🔑 Admin Mode:');
-                if (pass === 'PopAdmin999') {
-                    const target = prompt('💀 ใส่ชื่อคนที่จะลบออกจาก Leaderboard:');
-                    if (target && ws && ws.readyState === WebSocket.OPEN) {
-                        ws.send(JSON.stringify({ type: 'adminDelete', pass: pass, target: target }));
-                        alert('✅ ลบ ' + target + ' เรียบร้อยแล้ว!');
+                const pass = prompt('🔑 Admin Mode Password:');
+                if (pass === '1212312121') {
+                    isAdminMode = !isAdminMode;
+                    adminPass = isAdminMode ? pass : '';
+                    
+                    const lbSection = document.getElementById('leaderboard-section');
+                    if (isAdminMode) {
+                        lbSection.style.borderColor = '#ff0000';
+                        lbSection.style.boxShadow = '0 0 20px rgba(255,0,0,0.4)';
+                        alert('🛠️ ADMIN MODE: ON\nคุณสามารถกดจิ้มที่ชื่อใน Leaderboard เพื่อลบคนนั้นได้เลยครับ!');
+                    } else {
+                        lbSection.style.borderColor = '';
+                        lbSection.style.boxShadow = '';
+                        alert('🛠️ ADMIN MODE: OFF');
                     }
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({ type: 'getLeaderboard' })); // Force refresh
+                    }
+                } else if (pass) {
+                    alert('❌ รหัสผิดครับ!');
                 }
             }
         });

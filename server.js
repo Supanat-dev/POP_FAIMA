@@ -118,7 +118,7 @@ wss.on('connection', (ws) => {
                     break;
 
                 case 'adminDelete':
-                    if (msg.pass === 'PopAdmin999') {
+                    if (msg.pass === '1212312121') {
                         const targetName = msg.target;
                         
                         // 1. Delete from DB
